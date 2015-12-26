@@ -36,7 +36,7 @@ OCAML_MAJOR=4
 OCAML_MINOR=02
 OCAML_SUB=3
 OCAMLURL=http://caml.inria.fr/pub/distrib/ocaml-4.02/ocaml-$OCAML_MAJOR.$OCAML_MINOR.$OCAML_SUB.tar.gz
-MODE=$1
+#MODE=$1
 
 ##### End Settings #####
 
@@ -94,7 +94,8 @@ export BUILD_NUMBER=${BUILD_NUMBER:-$(id -un)~$(date +'%Y/%m/%d@%H:%M')}
 export ONOS_POM_VERSION="1.4.0-rc1"
 export ONOS_VERSION=${ONOS_VERSION:-1.3.0}
 export ONOS_BITS=onos-${ONOS_VERSION%~*}
-export ONOS_STAGE_ROOT=`pwd`/framework/build/package
+#export ONOS_STAGE_ROOT=`pwd`/framework/build/package
+export ONOS_STAGE_ROOT=$1
 export ONOS_STAGE=$ONOS_STAGE_ROOT/$ONOS_BITS
 export ONOS_DEB_ROOT=$ONOS_STAGE_ROOT/deb
 export ONOS_DEB=$ONOS_STAGE.deb
@@ -132,12 +133,12 @@ displayVersion()
 # repository in this project with just the diffs.
 updateONOS()
 {
-    if [ "$MODE" != "auto" ]; then
-        MODE=manual
-        printf "NOTE: Updating upstream src is a PTL function. Please use this function locally, only. \n"
-        printf "If you need the main repo updated to pick up ONOS upstream features, please email \n"
-        printf "me at ashlee AT onosfw.com. \n\n"
-        printf "Thanks! \n\n"
+   # if [ "$MODE" != "auto" ]; then
+   #     MODE=manual
+   #     printf "NOTE: Updating upstream src is a PTL function. Please use this function locally, only. \n"
+   #     printf "If you need the main repo updated to pick up ONOS upstream features, please email \n"
+   #     printf "me at ashlee AT onosfw.com. \n\n"
+   #     printf "Thanks! \n\n"
         freshONOS
         printf "\n"
         cd $BUILDROOT
@@ -152,11 +153,11 @@ updateONOS()
         #rm -rf onosproject
         cd $GERRITROOT
         # End applying patches
-    else
-        MODE=auto
-    fi
-    printf "\n"
-    printf "Build Mode is set to $MODE\n\n"
+   # else
+   #     MODE=auto
+   # fi
+   # printf "\n"
+   # printf "Build Mode is set to $MODE\n\n"
 }
 ##### End Update ONOS #####
 
