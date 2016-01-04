@@ -23,7 +23,6 @@ AUTHOR="Ashlee Young"
 MODIFIED="December 21, 2015"
 GERRITURL="git clone ssh://im2bz2pee@gerrit.opnfv.org:29418/onosfw"
 ONOSURL="https://github.com/opennetworkinglab/onos"
-SURICATAURL="https://github.com/inliniac/suricata"
 ONOSGIT="git clone --recursive $ONOSURL"
 JAVA_VERSION=1.8
 ANT_VERSION=1.9.6
@@ -82,16 +81,13 @@ export ONOS_GROUP=root
 export ONOS_CELL=sdnds-tw
 export RPMBUILDPATH=~/rpmbuild
 export PATCHES=$GERRITROOT/framework/patches
-export SURICATAROOT=$BUILDROOT/suricata
-export SURICATASRC=$GERRITROOT/framework/src/suricata
-export ONOSTAG=b209dc68e239009a9c1fdfe6fddeca0cf94fe9bf # 1.4.0-rc1 tag 
 
 export ONOSFW_ROOT=`pwd`/framework/build
 export M2_REPO=${M2_REPO:-~/.m2/repository}
 export PATH="$PATH:$ONOS_ROOT/tools/dev/bin:$ONOS_ROOT/tools/test/bin"
 export PATH="$PATH:$ONOS_ROOT/tools/build"
 export BUILD_NUMBER=${BUILD_NUMBER:-$(id -un)~$(date +'%Y/%m/%d@%H:%M')}
-export ONOS_POM_VERSION="1.4.0-rc1"
+export ONOS_POM_VERSION="1.5.0-SNAPSHOT"
 export ONOS_VERSION=${ONOS_VERSION:-1.3.0}
 export ONOS_BITS=onos-${ONOS_VERSION%~*}
 #export ONOS_STAGE_ROOT=`pwd`/framework/build/package
@@ -143,13 +139,13 @@ updateONOS()
         printf "\n"
         cd $BUILDROOT
         git clone $ONOSURL onosproject
-        cd onosproject
-        git checkout $ONOSTAG
-        cd ../
-        rsync -arvP --delete --exclude=.git --exclude=.gitignore --exclude=.gitreview onosproject/ ../src/onos/
-        cd onosproject
-        git log > ../onos_update.$(date +%s)
-        cd ../
+       # cd onosproject
+       # git checkout $ONOSTAG
+       # cd ../
+       # rsync -arvP --delete --exclude=.git --exclude=.gitignore --exclude=.gitreview onosproject/ ../src/onos/
+      #  cd onosproject
+      #  git log > ../onos_update.$(date +%s)
+      #  cd ../
         #rm -rf onosproject
         cd $GERRITROOT
         # End applying patches
@@ -301,24 +297,25 @@ buildONOS()
         if [ ! -d $ONOSROOT ]; then
                 clear
                 mkdir -p $ONOSROOT
-                cp -rv $ONOSRC/* $ONOSROOT/
-                if [ -d $PATCHES/onos ]; then
-                    cd $PATCHES
-                    files=$(find . ! -path . -type f | grep -v 0) # Checks for any files in patches directory
-                    if [ $"files" > 0 ]; then
-                        for file in $files; do
-                            FILEPATH=$(dirname $file) #isolate just the relative path so we can re-create it
-                            if [ ! -d "$BUILDROOT/$FILEPATH" ]; then
-                                mkdir -p $BUILDROOT/$FILEPATH #recreate the relative path
-                            fi
-                                cp -v $file $BUILDROOT/$FILEPATH/. #copy all files to proper location(s)
-                        done
-                    fi
-                    cd $GERRITROOT
-                fi
+                #cp -rv $ONOSRC/* $ONOSROOT/
+                cp -rf $BUILDROOT/onosproject/* $ONOSROOT/
+#                if [ -d $PATCHES/onos ]; then
+#                    cd $PATCHES
+##                    files=$(find . ! -path . -type f | grep -v 0) # Checks for any files in patches directory
+#                    if [ $"files" > 0 ]; then
+#                        for file in $files; do
+#                            FILEPATH=$(dirname $file) #isolate just the relative path so we can re-create it
+#                            if [ ! -d "$BUILDROOT/$FILEPATH" ]; then
+#                                mkdir -p $BUILDROOT/$FILEPATH #recreate the relative path
+#                            fi
+#                                cp -v $file $BUILDROOT/$FILEPATH/. #copy all files to proper location(s)
+#                        done
+#                    fi
+#                    cd $GERRITROOT
+#                fi
                 cd $ONOSROOT
                 ln -sf $KARAF_ROOT/apache-karaf-$KARAF_VERSION apache-karaf-$KARAF_VERSION
-                mvn clean install
+                mvn clean install -DskipTests
                 if [ -f "$ONOSROOT/tools/build/envDefaults" ]; then
                     export ONOSVERSION="`cat $ONOSROOT/tools/build/envDefaults | grep "export ONOS_POM_VERSION" \
                     | awk -F "=" {'print $2'} | sed -e 's/^"//'  -e 's/"$//' |  awk -F "-" {'print $1'}`-onosfw-$(date +%s)"
